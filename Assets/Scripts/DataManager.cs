@@ -18,7 +18,6 @@ public class DataManager : MonoBehaviour
 	private const int KEY = 0;
 	private const int VALUE = 1;
 
-	private const float SAVE_TO_DISK_REPEAT_RATE = 5.0f;
     private const string DATA_FILE_NAME = "Data.text";
     #endregion
 
@@ -82,8 +81,6 @@ public class DataManager : MonoBehaviour
 	void Start () 
 	{
 		LoadFromFile();
-
-		InvokeRepeating("SaveToDisk", SAVE_TO_DISK_REPEAT_RATE, SAVE_TO_DISK_REPEAT_RATE);
 	}    
     #endregion
 
@@ -100,13 +97,6 @@ public class DataManager : MonoBehaviour
 			m_data.Add(paramName, param);
 		}
 	}
-
-	private void SaveToDisk ()
-    {
-        PlayerPrefs.Save();
-
-        SaveToFile();
-    }
 
 	private void SaveToFile()
     {
@@ -149,6 +139,9 @@ public class DataManager : MonoBehaviour
     	SaveToMemory (paramName, param);
 
 		PlayerPrefs.SetString(paramName, (string) param);
+		PlayerPrefs.Save();
+
+		SaveToFile();
     }
 
     public string GetParamString (string paramName)
@@ -166,6 +159,9 @@ public class DataManager : MonoBehaviour
     	SaveToMemory (paramName, param);
 
    		PlayerPrefs.SetInt(paramName, (bool) param ? TRUE : FALSE);
+		PlayerPrefs.Save();
+
+		SaveToFile();
     }
 
     public bool GetParamBool (string paramName)
@@ -181,6 +177,9 @@ public class DataManager : MonoBehaviour
     	SaveToMemory (paramName, param);
 
     	PlayerPrefs.SetInt(paramName, param);
+		PlayerPrefs.Save();
+
+		SaveToFile();
     }
 
     public int GetParamInt (string paramName)
@@ -196,6 +195,9 @@ public class DataManager : MonoBehaviour
     	SaveToMemory (paramName, param);
 
     	PlayerPrefs.SetFloat(paramName, param);
+		PlayerPrefs.Save();
+
+		SaveToFile();
     }	
 
     public float GetParamFloat (string paramName)
