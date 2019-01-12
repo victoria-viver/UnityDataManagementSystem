@@ -15,11 +15,16 @@ public class DataManager : MonoBehaviour
 	private const int TRUE = 1;
     private const int FALSE = 0;
 
-	private const float SAVE_TO_DISK_REPEAT_RATE = 10.0f;
-	#endregion
+	private const int KEY = 0;
+	private const int VALUE = 1;
+
+	private const float SAVE_TO_DISK_REPEAT_RATE = 5.0f;
+    private const string DATA_FILE_NAME = "Data.text";
+    #endregion
 
 
     #region Private Fields
+	private string m_dataFilePath;
     private Dictionary <string, object> m_data = new Dictionary<string, object>();
     #endregion
 
@@ -69,18 +74,22 @@ public class DataManager : MonoBehaviour
 			instance = this;
 			DontDestroyOnLoad (gameObject);
 		}
-		//		
+		//
+
+		m_dataFilePath = Path.Combine(Application.streamingAssetsPath, DATA_FILE_NAME);
 	}
 
 	void Start () 
 	{
+		LoadFromFile();
+
 		InvokeRepeating("SaveToDisk", SAVE_TO_DISK_REPEAT_RATE, SAVE_TO_DISK_REPEAT_RATE);
-	}
-	#endregion
+	}    
+    #endregion
 
 
-	#region Private Methods
-	private void SaveToMemory (string paramName, object param)
+    #region Private Methods
+    private void SaveToMemory (string paramName, object param)
 	{
 		if (m_data.ContainsKey(paramName))
 		{
@@ -107,11 +116,28 @@ public class DataManager : MonoBehaviour
 
             foreach (var item in m_data)
             {
-                dataAsString += string.Format("{0}: {1}\n", item.Key, item.Value);
+                dataAsString += string.Format("{0}:{1}\n", item.Key, item.Value);
             }
 
-            File.WriteAllText(Application.streamingAssetsPath + "/GameData.text", dataAsString);
+            File.WriteAllText(m_dataFilePath, dataAsString);
         }
+    }
+
+	private void LoadFromFile()
+    {
+		if (File.Exists(m_dataFilePath))
+		{
+			string text = System.IO.File.ReadAllText(m_dataFilePath);
+			string[] data = text.Split (new Char [] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
+			int entriesCount = data.Length;
+
+			for (int i = 0; i < entriesCount; i++)
+			{
+				string[] line = data[i].Split (new Char [] {':'}, StringSplitOptions.RemoveEmptyEntries);
+
+				SaveToMemory(line[KEY], line[VALUE]);
+			}		
+		}
     }
     #endregion
 	
