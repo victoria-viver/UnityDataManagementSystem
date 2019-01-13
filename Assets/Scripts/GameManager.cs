@@ -56,27 +56,24 @@ public class GameManager : MonoBehaviour
 			instance = this;
 			DontDestroyOnLoad (gameObject);
 		}
-		//
-
-		// DataManager.Instance.SetStorageType(DataManager.StorageType.PlayerPrefs);
-		DataManager.Instance.SetStorageType(DataManager.StorageType.File);
+		//		
 	}
 
 	void Start () 
 	{
-		// DataManager.Instance.SaveParam("username", "Victoria");
-		// DataManager.Instance.SaveParam("level", 3);
-		// DataManager.Instance.SaveParam("experience", 150);
-		// DataManager.Instance.SaveParam("health", 0.75f);
-		// DataManager.Instance.SaveParam("score", 500);	
-		// DataManager.Instance.SaveParam("firstSession", true);
-
+		// DataManager.Instance.SetStorageType(DataManager.StorageType.PlayerPrefs);
+		DataManager.Instance.SetStorageType(DataManager.StorageType.File);
+		
+		DataManager.Instance.SaveParam("username", "Victoria");
+		DataManager.Instance.SaveParam("score", 30);
+		DataManager.Instance.SaveParam("winPercentage", 0.75f);
+		DataManager.Instance.SaveParam("isUserAuthorized", true);
 		experience = DataManager.Instance.GetParamInt ("experience");
 
 		Debug.Log(DataManager.Instance.GetParamString ("username"));
-		Debug.Log(DataManager.Instance.GetParamInt ("level"));
-		Debug.Log(DataManager.Instance.GetParamFloat ("health"));
-		Debug.Log(DataManager.Instance.GetParamBool ("firstSession"));
+		Debug.Log(DataManager.Instance.GetParamInt ("score"));
+		Debug.Log(DataManager.Instance.GetParamFloat ("winPercentage"));
+		Debug.Log(DataManager.Instance.GetParamBool ("isUserAuthorized"));
 	}
 	
 	void Update () 
