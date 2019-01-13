@@ -23,12 +23,14 @@ public class DataManager : MonoBehaviour
 
 
     #region Private Fields
+	private StorageType m_storageType;
 	private string m_dataFilePath;
     private Dictionary <string, object> m_data = new Dictionary<string, object>();
     #endregion
 
 
-	#region Public Fields	
+	#region Public Fields
+	public enum StorageType {PlayerPrefs, File}; //Only one can be chosen	
     #endregion
 
 
@@ -44,26 +46,19 @@ public class DataManager : MonoBehaviour
 		get 
 		{ 
 			if (instance == null)
-			{
-				GameObject go = GameObject.Find ("DataManager");
-
-				if (go != null)
-				{
-					instance = go.GetComponent<DataManager>();
-				}
-			}
+				instance = (DataManager) FindObjectOfType(typeof(DataManager));	
 
 			if (instance == null)
 				instance = new GameObject ("DataManager").AddComponent<DataManager>();
 				
 			return instance;
 		}
-    }
+    }    
     #endregion Singleton
 
 
-	#region Unity Methods
-	void Awake () 
+    #region Unity Methods
+    void Awake () 
 	{
 		//Singleton
 		if (instance)
@@ -76,12 +71,7 @@ public class DataManager : MonoBehaviour
 		//
 
 		m_dataFilePath = Path.Combine(Application.streamingAssetsPath, DATA_FILE_NAME);
-	}
-
-	void Start () 
-	{
-		LoadFromFile();
-	}    
+	} 
     #endregion
 
 
@@ -123,9 +113,13 @@ public class DataManager : MonoBehaviour
 
 			for (int i = 0; i < entriesCount; i++)
 			{
+				//TODO: find solution for preventing this symbol use in keys 
 				string[] line = data[i].Split (new Char [] {':'}, StringSplitOptions.RemoveEmptyEntries);
 
-				SaveToMemory(line[KEY], line[VALUE]);
+				if (!string.IsNullOrEmpty(line[KEY]))
+				{
+					SaveToMemory(line[KEY], line[VALUE]);
+				}				
 			}		
 		}
     }
@@ -133,22 +127,57 @@ public class DataManager : MonoBehaviour
 	
 
 	#region Public Methods
+	public void SetStorageType (StorageType storageType)
+	{
+		m_storageType = storageType;
+
+		OnStorageTypeSet ();
+	}
+
+    private void OnStorageTypeSet()
+    {
+        if (m_storageType == StorageType.File)
+		{
+			LoadFromFile();
+		}
+    }
+
     //String
     public void SaveParam (string paramName, string param)
     {
     	SaveToMemory (paramName, param);
 
-		PlayerPrefs.SetString(paramName, (string) param);
-		PlayerPrefs.Save();
-
-		SaveToFile();
+		switch (m_storageType)
+		{
+			case StorageType.PlayerPrefs:
+				PlayerPrefs.SetString(paramName, (string) param);
+				PlayerPrefs.Save();
+				break;
+			case StorageType.File:
+				SaveToFile();
+				break;
+			default:
+				Debug.LogError("StorageType isn't set");
+				break;
+		}
     }
 
     public string GetParamString (string paramName)
     {
-    	string param = PlayerPrefs.GetString(paramName);
+		string param = string.Empty;
 
-    	return param;
+		if (m_data.ContainsKey(paramName))
+		{
+			param = (string) m_data[paramName];
+		}			
+		else if (m_storageType == StorageType.PlayerPrefs)
+		{
+			param = PlayerPrefs.GetString(paramName);
+
+			SaveToMemory(paramName, param);
+		}
+		
+		return param;
     }
     //
 
@@ -158,15 +187,37 @@ public class DataManager : MonoBehaviour
     {
     	SaveToMemory (paramName, param);
 
-   		PlayerPrefs.SetInt(paramName, (bool) param ? TRUE : FALSE);
-		PlayerPrefs.Save();
-
-		SaveToFile();
+		switch (m_storageType)
+		{
+			case StorageType.PlayerPrefs:
+				PlayerPrefs.SetInt(paramName, (bool) param ? TRUE : FALSE);
+				PlayerPrefs.Save();
+				break;
+			case StorageType.File:
+				SaveToFile();
+				break;
+			default:
+				Debug.LogError("StorageType isn't set");
+				break;
+		}
     }
 
     public bool GetParamBool (string paramName)
     {
-    	return (PlayerPrefs.GetInt(paramName) == TRUE ? true : false);
+		bool param = false;
+
+		if (m_data.ContainsKey(paramName))
+		{
+			bool.TryParse((string) m_data[paramName], out param);
+		}			
+		else if (m_storageType == StorageType.PlayerPrefs)
+		{
+			param = (PlayerPrefs.GetInt(paramName) == TRUE ? true : false);
+
+			SaveToMemory(paramName, param);
+		}
+		
+		return param;
     }
     //
 
@@ -176,15 +227,37 @@ public class DataManager : MonoBehaviour
     {
     	SaveToMemory (paramName, param);
 
-    	PlayerPrefs.SetInt(paramName, param);
-		PlayerPrefs.Save();
-
-		SaveToFile();
+		switch (m_storageType)
+		{
+			case StorageType.PlayerPrefs:
+				PlayerPrefs.SetInt(paramName, param);
+				PlayerPrefs.Save();
+				break;
+			case StorageType.File:
+				SaveToFile();
+				break;
+			default:
+				Debug.LogError("StorageType isn't set");
+				break;
+		}
     }
 
     public int GetParamInt (string paramName)
     {
-    	return PlayerPrefs.GetInt(paramName);
+    	int param = 0;
+
+		if (m_data.ContainsKey(paramName))
+		{
+			int.TryParse((string) m_data[paramName], out param);
+		}			
+		else if (m_storageType == StorageType.PlayerPrefs)
+		{
+			param = PlayerPrefs.GetInt(paramName);
+
+			SaveToMemory(paramName, param);
+		}
+		
+		return param;
     }
     //
 
@@ -194,15 +267,37 @@ public class DataManager : MonoBehaviour
     {
     	SaveToMemory (paramName, param);
 
-    	PlayerPrefs.SetFloat(paramName, param);
-		PlayerPrefs.Save();
-
-		SaveToFile();
+		switch (m_storageType)
+		{
+			case StorageType.PlayerPrefs:
+				PlayerPrefs.SetFloat(paramName, param);
+				PlayerPrefs.Save();
+				break;
+			case StorageType.File:
+				SaveToFile();
+				break;
+			default:
+				Debug.LogError("StorageType isn't set");
+				break;
+		}
     }	
 
     public float GetParamFloat (string paramName)
     {
-    	return PlayerPrefs.GetFloat(paramName);
+    	float param = 0.0f;
+
+		if (m_data.ContainsKey(paramName))
+		{
+			float.TryParse((string) m_data[paramName], out param);
+		}			
+		else if (m_storageType == StorageType.PlayerPrefs)
+		{
+			param = PlayerPrefs.GetFloat(paramName);
+
+			SaveToMemory(paramName, param);
+		}
+		
+		return param;
     }
     //
     #endregion

@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
 
 
 	#region Private Fields
+	private int experience = 0;
     #endregion
 
 
@@ -33,14 +34,7 @@ public class GameManager : MonoBehaviour
 		get 
 		{ 
 			if (instance == null)
-			{
-				GameObject go = GameObject.Find ("GameManager");
-
-				if (go != null)
-				{
-					instance = go.GetComponent<GameManager>();
-				}
-			}				
+				instance = (GameManager) FindObjectOfType(typeof(GameManager));		
 
 			if (instance == null)
 				instance = new GameObject ("GameManager").AddComponent<GameManager>();
@@ -62,17 +56,22 @@ public class GameManager : MonoBehaviour
 			instance = this;
 			DontDestroyOnLoad (gameObject);
 		}
-		//		
+		//
+
+		// DataManager.Instance.SetStorageType(DataManager.StorageType.PlayerPrefs);
+		DataManager.Instance.SetStorageType(DataManager.StorageType.File);
 	}
 
 	void Start () 
 	{
-		DataManager.Instance.SaveParam("username", "Victoria");
-		DataManager.Instance.SaveParam("level", 3);
-		DataManager.Instance.SaveParam("experience", 150);
-		DataManager.Instance.SaveParam("health", 0.75f);
-		DataManager.Instance.SaveParam("score", 500);	
-		DataManager.Instance.SaveParam("firstSession", true);		
+		// DataManager.Instance.SaveParam("username", "Victoria");
+		// DataManager.Instance.SaveParam("level", 3);
+		// DataManager.Instance.SaveParam("experience", 150);
+		// DataManager.Instance.SaveParam("health", 0.75f);
+		// DataManager.Instance.SaveParam("score", 500);	
+		// DataManager.Instance.SaveParam("firstSession", true);
+
+		experience = DataManager.Instance.GetParamInt ("experience");
 
 		Debug.Log(DataManager.Instance.GetParamString ("username"));
 		Debug.Log(DataManager.Instance.GetParamInt ("level"));
@@ -82,7 +81,8 @@ public class GameManager : MonoBehaviour
 	
 	void Update () 
 	{
-		
+		experience++;
+		DataManager.Instance.SaveParam("experience", experience);
 	}
 	#endregion
 
