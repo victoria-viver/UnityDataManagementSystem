@@ -162,9 +162,9 @@ public class DataManager : MonoBehaviour
 		}
     }
 
-    public string GetParamString (string paramName)
+    public string GetParamString (string paramName, string defaultValue = "")
     {
-		string param = string.Empty;
+		string param = defaultValue;
 
 		if (m_data.ContainsKey(paramName))
 		{
@@ -202,9 +202,9 @@ public class DataManager : MonoBehaviour
 		}
     }
 
-    public bool GetParamBool (string paramName)
+    public bool GetParamBool (string paramName, bool defaultValue = false)
     {
-		bool param = false;
+		bool param = defaultValue;
 
 		if (m_data.ContainsKey(paramName))
 		{
@@ -242,9 +242,9 @@ public class DataManager : MonoBehaviour
 		}
     }
 
-    public int GetParamInt (string paramName)
+    public int GetParamInt (string paramName, int defaultValue = 0)
     {
-    	int param = 0;
+    	int param = defaultValue;
 
 		if (m_data.ContainsKey(paramName))
 		{
@@ -282,9 +282,9 @@ public class DataManager : MonoBehaviour
 		}
     }	
 
-    public float GetParamFloat (string paramName)
+    public float GetParamFloat (string paramName, float defaultValue = 0.0f)
     {
-    	float param = 0.0f;
+    	float param = defaultValue;
 
 		if (m_data.ContainsKey(paramName))
 		{
