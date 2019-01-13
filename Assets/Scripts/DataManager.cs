@@ -41,7 +41,7 @@ public class DataManager : MonoBehaviour
     #region Singleton
     private static DataManager instance = null;
 
-    internal static DataManager Instance 
+    public static DataManager Instance 
 	{
 		get 
 		{ 
@@ -49,7 +49,7 @@ public class DataManager : MonoBehaviour
 				instance = (DataManager) FindObjectOfType(typeof(DataManager));	
 
 			if (instance == null)
-				instance = new GameObject ("DataManager").AddComponent<DataManager>();
+				instance = new GameObject ("DataManager").AddComponent<DataManager>();				
 				
 			return instance;
 		}
@@ -208,7 +208,7 @@ public class DataManager : MonoBehaviour
 
 		if (m_data.ContainsKey(paramName))
 		{
-			bool.TryParse((string) m_data[paramName], out param);
+			param = (bool) m_data[paramName];
 		}			
 		else if (m_storageType == StorageType.PlayerPrefs)
 		{
@@ -248,7 +248,7 @@ public class DataManager : MonoBehaviour
 
 		if (m_data.ContainsKey(paramName))
 		{
-			int.TryParse((string) m_data[paramName], out param);
+			param = Convert.ToInt32(m_data[paramName]);
 		}			
 		else if (m_storageType == StorageType.PlayerPrefs)
 		{
@@ -288,7 +288,7 @@ public class DataManager : MonoBehaviour
 
 		if (m_data.ContainsKey(paramName))
 		{
-			float.TryParse((string) m_data[paramName], out param);
+			param = (float) Convert.ToDecimal(m_data[paramName]);
 		}			
 		else if (m_storageType == StorageType.PlayerPrefs)
 		{
