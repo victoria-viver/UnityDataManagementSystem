@@ -98,6 +98,32 @@ public class DataManager : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Saves data to PlayerPrefs as encrypted string 
+	/// </summary>
+	/// <param name="paramName">Used to specify entry's to save name</param>
+	/// <param name="param">Used to specify entry's to save value</param>
+	private static void SaveToPlayerPrefs(string paramName, string param)
+    {
+        PlayerPrefs.SetString(paramName, CryptographyHelper.Encrypt(param));
+        PlayerPrefs.Save();
+    }
+
+	/// <summary>
+	/// Returns decrypted loaded from PlayerPrefs data if exists
+	/// </summary>
+	/// <param name="paramName">Used to specify entry's to save name</param>
+	/// <returns></returns>	
+	private static string GetFromPlayerPrefs(string paramName)
+    {
+		string param = PlayerPrefs.GetString(paramName, string.Empty);
+
+		if (!string.IsNullOrEmpty(param))
+			param = CryptographyHelper.Decrypt(param);
+
+        return param;
+    }
+
+	/// <summary>
 	/// Creates string from memory data dictionary and saves it to a text file
 	/// </summary>
 	private void SaveToFile()
@@ -198,11 +224,10 @@ public class DataManager : MonoBehaviour
 		{
 			case StorageType.Memory:
 				break;
-			case StorageType.PlayerPrefs:
-				PlayerPrefs.SetString(paramName, param);
-				PlayerPrefs.Save();
-				break;
-			case StorageType.File:
+            case StorageType.PlayerPrefs:
+                SaveToPlayerPrefs(paramName, param);
+                break;
+            case StorageType.File:
 				SaveToFile();
 				break;
 			default:
@@ -211,12 +236,12 @@ public class DataManager : MonoBehaviour
 		}
     }
 
-	/// <summary>
-	/// Returns requested string
-	/// </summary>
-	/// <param name="paramName">Requested string name</param>
-	/// <param name="defaultValue">Optional - used for default value if entry isn't found</param>
-	/// <returns></returns>
+    /// <summary>
+    /// Returns requested string
+    /// </summary>
+    /// <param name="paramName">Requested string name</param>
+    /// <param name="defaultValue">Optional - used for default value if entry isn't found</param>
+    /// <returns></returns>
     public string GetParamString (string paramName, string defaultValue = "")
     {
 		string param = defaultValue;
@@ -226,24 +251,22 @@ public class DataManager : MonoBehaviour
 			param = m_dataDictionary[paramName].ToString();
 		}			
 		else if (m_storageType == StorageType.PlayerPrefs)
-		{
-			param = PlayerPrefs.GetString(paramName);
-
+        {
 			//Save to memory for current session future faster reuse
-			SaveToMemory(paramName, param);
-		}		
-		
-		return param;
+            param = GetFromPlayerPrefs(paramName);            
+            SaveToMemory(paramName, param);
+        }
+
+        return param;
     }
-    //
 
 
     //Bool
-	/// <summary>
-	/// Saves got bool
-	/// </summary>
-	/// <param name="paramName">Bool to save name</param>
-	/// <param name="param">Bool to save value</param>
+    /// <summary>
+    /// Saves got bool
+    /// </summary>
+    /// <param name="paramName">Bool to save name</param>
+    /// <param name="param">Bool to save value</param>
     public void SaveParam (string paramName, bool param)
     {
 		//Always save to memory for faster access
@@ -254,8 +277,7 @@ public class DataManager : MonoBehaviour
 			case StorageType.Memory:
 				break;
 			case StorageType.PlayerPrefs:
-				PlayerPrefs.SetInt(paramName, param ? TRUE : FALSE);
-				PlayerPrefs.Save();
+				SaveToPlayerPrefs(paramName, (param ? TRUE : FALSE).ToString());
 				break;
 			case StorageType.File:
 				SaveToFile();
@@ -282,15 +304,13 @@ public class DataManager : MonoBehaviour
 		}			
 		else if (m_storageType == StorageType.PlayerPrefs)
 		{
-			param = (PlayerPrefs.GetInt(paramName) == TRUE ? true : false);
-
 			//Save to memory for current session future faster reuse
+			param = (int.Parse(GetFromPlayerPrefs(paramName)) == TRUE ? true : false);
 			SaveToMemory(paramName, param);
 		}
 		
 		return param;
     }
-    //
 
 
     //Int
@@ -309,8 +329,7 @@ public class DataManager : MonoBehaviour
 			case StorageType.Memory:
 				break;
 			case StorageType.PlayerPrefs:
-				PlayerPrefs.SetInt(paramName, param);
-				PlayerPrefs.Save();
+				SaveToPlayerPrefs(paramName, param.ToString());
 				break;
 			case StorageType.File:
 				SaveToFile();
@@ -337,16 +356,14 @@ public class DataManager : MonoBehaviour
 		}			
 		else if (m_storageType == StorageType.PlayerPrefs)
 		{
-			param = PlayerPrefs.GetInt(paramName);
-
 			//Save to memory for current session future faster reuse
+			param = int.Parse(GetFromPlayerPrefs(paramName));
 			SaveToMemory(paramName, param);
 		}
 		
 		return param;
     }
-    //
-
+    
 
     //Float
 	/// <summary>
@@ -364,8 +381,7 @@ public class DataManager : MonoBehaviour
 			case StorageType.Memory:
 				break;
 			case StorageType.PlayerPrefs:
-				PlayerPrefs.SetFloat(paramName, param);
-				PlayerPrefs.Save();
+				SaveToPlayerPrefs(paramName, param.ToString());
 				break;
 			case StorageType.File:
 				SaveToFile();
@@ -392,9 +408,8 @@ public class DataManager : MonoBehaviour
 		}			
 		else if (m_storageType == StorageType.PlayerPrefs)
 		{
-			param = PlayerPrefs.GetFloat(paramName);
-			
 			//Save to memory for current session future faster reuse
+			param = float.Parse(GetFromPlayerPrefs(paramName));			
 			SaveToMemory(paramName, param);
 		}
 		
