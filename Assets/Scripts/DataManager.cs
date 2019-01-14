@@ -108,7 +108,7 @@ public class DataManager : MonoBehaviour
 
             foreach (var item in m_dataDictionary)
             {
-                dataAsString += string.Format("{0}:{1}\n", item.Key, item.Value);
+                dataAsString += string.Format("{0}:{1}\n", item.Key, CryptographyHelper.Encrypt(item.Value.ToString()));
             }
 
 			try
@@ -149,7 +149,7 @@ public class DataManager : MonoBehaviour
 				if (!string.IsNullOrEmpty(line[KEY]))
 				{
 					//Add or update memory data with loaded from a file data
-					SaveToMemory(line[KEY], line[VALUE]);
+					SaveToMemory(line[KEY], CryptographyHelper.Decrypt(line[VALUE]));
 				}				
 			}
 
