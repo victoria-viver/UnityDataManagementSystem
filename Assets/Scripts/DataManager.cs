@@ -4,7 +4,6 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -18,6 +17,8 @@ public class DataManager : MonoBehaviour
 	private const int KEY = 0;
 	private const int VALUE = 1;
 
+	private const float FILE_SAVE_RETRY_DELAY = 0.1f;
+
     private const string DATA_FILE_NAME = "Data.text";
     #endregion
 
@@ -27,6 +28,7 @@ public class DataManager : MonoBehaviour
 	private StorageType m_storageType = StorageType.Memory;
 	private string m_dataFilePath;    
 	private bool m_isLoadingFromFileFinished = true;
+	private bool m_waitingForSaveRetry = false;
     #endregion
 
 
@@ -109,7 +111,19 @@ public class DataManager : MonoBehaviour
                 dataAsString += string.Format("{0}:{1}\n", item.Key, item.Value);
             }
 
-            File.WriteAllText(m_dataFilePath, dataAsString);
+			try
+			{
+				File.WriteAllText(m_dataFilePath, dataAsString);				
+				m_waitingForSaveRetry = false;
+			}
+			catch (System.Exception ex)
+			{
+				if (!m_waitingForSaveRetry)
+				{
+					m_waitingForSaveRetry = true;
+					Invoke("SaveToFile", FILE_SAVE_RETRY_DELAY);
+				}
+			}
         }
     }
 
@@ -209,7 +223,7 @@ public class DataManager : MonoBehaviour
 
 		if (m_dataDictionary.ContainsKey(paramName))
 		{
-			param = (string) m_dataDictionary[paramName];
+			param = m_dataDictionary[paramName].ToString();
 		}			
 		else if (m_storageType == StorageType.PlayerPrefs)
 		{
@@ -217,7 +231,7 @@ public class DataManager : MonoBehaviour
 
 			//Save to memory for current session future faster reuse
 			SaveToMemory(paramName, param);
-		}
+		}		
 		
 		return param;
     }
@@ -264,7 +278,7 @@ public class DataManager : MonoBehaviour
 
 		if (m_dataDictionary.ContainsKey(paramName))
 		{
-			param = (bool) m_dataDictionary[paramName];
+			param = bool.Parse((m_dataDictionary[paramName]).ToString());
 		}			
 		else if (m_storageType == StorageType.PlayerPrefs)
 		{
