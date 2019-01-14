@@ -74,6 +74,7 @@ public class GameManager : MonoBehaviour
 		Debug.Log(DataManager.Instance.GetParamInt ("score"));
 		Debug.Log(DataManager.Instance.GetParamFloat ("winPercentage"));
 		Debug.Log(DataManager.Instance.GetParamBool ("isUserAuthorized"));
+		Debug.Log(experience);
 	}
 	
 	void Update () 
